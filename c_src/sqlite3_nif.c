@@ -1363,7 +1363,7 @@ exqlite_column_types(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
                 columns[i] = am_null;
                 break;
             default:
-                return make_error_tuple(env, enif_make_string(env, "Unknown column type to sqlite3_nif", ERL_NIF_UTF8));
+                return make_error_tuple(env, enif_make_string(env, "Unknown column type to sqlite3_nif", ERL_NIF_LATIN1));
         }
     }
 
