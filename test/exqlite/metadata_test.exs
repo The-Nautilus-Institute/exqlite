@@ -8,5 +8,9 @@ defmodule Exqlite.MetadataTest do
       assert is_list(Sqlite3.compile_options)
       assert length(Sqlite3.compile_options) > 0
     end
+
+    test "enables column metadata" do
+      assert Enum.member?(Sqlite3.compile_options, "ENABLE_COLUMN_METADATA")
+    end
   end
 end
