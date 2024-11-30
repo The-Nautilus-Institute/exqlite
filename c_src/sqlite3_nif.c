@@ -1312,6 +1312,67 @@ exqlite_column_origins(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return make_ok_tuple(env, result);
 }
 
+static ERL_NIF_TERM
+exqlite_column_types(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    statement_t* statement;
+    int column_count = 0;
+    ERL_NIF_TERM* columns;
+    ERL_NIF_TERM result;
+    
+    if (argc != 1) {
+        return enif_make_badarg(env);
+    }
+
+    if (!enif_get_resource(env, argv[0], statement_type, (void**)&statement)) {
+        return raise_badarg(env, argv[0]);
+    }
+
+    column_count = sqlite3_column_count(statement->statement);
+    if (column_count == 0) {
+        return make_ok_tuple(env, enif_make_list(env, 0));
+    }
+
+    columns = enif_alloc(sizeof(ERL_NIF_TERM) * column_count);
+    if (!columns) {
+        return make_error_tuple(env, am_out_of_memory);
+    }
+
+    ERL_NIF_TERM am_integer = enif_make_atom(env, "integer");
+    ERL_NIF_TERM am_float = enif_make_atom(env, "float");
+    ERL_NIF_TERM am_text = enif_make_atom(env, "text");
+    ERL_NIF_TERM am_blob = enif_make_atom(env, "blob");
+    ERL_NIF_TERM am_null = enif_make_atom(env, "null");
+
+    for (int i = 0; i < column_count; i++) {
+        int column_type = sqlite3_column_type(statement->statement, i);
+        switch (column_type) {
+            case SQLITE_INTEGER:
+                columns[i] = am_integer;
+                break;
+            case SQLITE_FLOAT:
+                columns[i] = am_float;
+                break;
+            case SQLITE_TEXT:
+                columns[i] = am_text;
+                break;
+            case SQLITE_BLOB:
+                columns[i] = am_blob;
+                break;
+            case SQLITE_NULL:
+                columns[i] = am_null;
+                break;
+            default:
+                return make_error_tuple(env, enif_make_string(env, "Unknown column type to sqlite3_nif", ERL_NIF_UTF8));
+        }
+    }
+
+    result = enif_make_list_from_array(env, columns, column_count);
+    enif_free(columns);
+
+    return make_ok_tuple(env, result);
+}
+
 //
 // Most of our nif functions are going to be IO bounded
 //
@@ -1345,6 +1406,7 @@ static ErlNifFunc nif_funcs[] = {
   {"errstr", 1, exqlite_errstr},
   {"compile_options", 0, exqlite_compile_options},
   {"column_origins", 1, exqlite_column_origins},
+  {"column_types", 1, exqlite_column_types}
 };
 
 ERL_NIF_INIT(Elixir.Exqlite.Sqlite3NIF, nif_funcs, on_load, NULL, NULL, on_unload)

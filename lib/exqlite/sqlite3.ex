@@ -471,6 +471,8 @@ defmodule Exqlite.Sqlite3 do
 
   def column_origins(stmt), do: Sqlite3NIF.column_origins(stmt)
 
+  def column_types(stmt), do: Sqlite3NIF.column_types(stmt)
+
   defp convert(%Date{} = val), do: Date.to_iso8601(val)
   defp convert(%Time{} = val), do: Time.to_iso8601(val)
   defp convert(%NaiveDateTime{} = val), do: NaiveDateTime.to_iso8601(val)
