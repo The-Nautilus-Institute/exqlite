@@ -28,4 +28,19 @@ defmodule Exqlite.MetadataTest do
       ]
     end
   end
+
+  describe ".column_types/1" do
+    test "returns the column types" do
+      {:ok, conn} = Sqlite3.open(":memory:")
+      {:ok, stmt} = Sqlite3.prepare(conn, "SELECT * from sqlite_schema")
+      {:ok, types} = Sqlite3.column_types(stmt)
+      assert types == [
+        "text",
+        "text",
+        "text",
+        "integer",
+        "text"
+      ]
+    end
+  end
 end
