@@ -99,5 +99,8 @@ defmodule Exqlite.Sqlite3NIF do
   @spec compile_options() :: list(String.t())
   def compile_options(), do: :erlang.nif_error(:not_loaded)
 
+  @spec column_origins(statement) :: {:ok, list({String.t(), String.t(), String.t()})} | {:error, reason()}
+  def column_origins(_stmt), do: :erlang.nif_error(:not_loaded)
+
   # add statement inspection tooling https://sqlite.org/c3ref/expanded_sql.html
 end

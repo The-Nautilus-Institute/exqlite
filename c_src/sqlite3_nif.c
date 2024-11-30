@@ -1240,6 +1240,7 @@ exqlite_errstr(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return make_binary(env, msg, strlen(msg));
 }
 
+// metadata
 static ERL_NIF_TERM
 exqlite_compile_options(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
@@ -1255,6 +1256,60 @@ exqlite_compile_options(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
         options = enif_make_list_cell(env, make_binary(env, option, strlen(option)), options);
     } while (1);
     return options;
+}
+
+static ERL_NIF_TERM
+exqlite_column_origins(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    statement_t* statement;
+    int column_count = 0;
+    ERL_NIF_TERM* columns;
+    ERL_NIF_TERM result;
+    
+    if (argc != 1) {
+        return enif_make_badarg(env);
+    }
+
+    if (!enif_get_resource(env, argv[0], statement_type, (void**)&statement)) {
+        return raise_badarg(env, argv[0]);
+    }
+
+    column_count = sqlite3_column_count(statement->statement);
+    if (column_count == 0) {
+        return make_ok_tuple(env, enif_make_list(env, 0));
+    }
+
+    columns = enif_alloc(sizeof(ERL_NIF_TERM) * column_count);
+    if (!columns) {
+        return make_error_tuple(env, am_out_of_memory);
+    }
+
+    for (int i = 0; i < column_count; i++) {
+        const char* database_name;
+        const char* table_name;
+        const char* origin_name;
+        
+        database_name = sqlite3_column_database_name(statement->statement, i);
+        table_name = sqlite3_column_table_name(statement->statement, i);
+        origin_name = sqlite3_column_origin_name(statement->statement, i);
+
+        if ((!database_name) || (!table_name) || (!origin_name)) {
+            enif_free(columns);
+            return make_error_tuple(env, am_out_of_memory);
+        }
+
+        columns[i] = enif_make_tuple3(
+            env,
+            make_binary(env, database_name, strlen(database_name)),
+            make_binary(env, table_name, strlen(table_name)),
+            make_binary(env, origin_name, strlen(origin_name))
+        );
+    }
+
+    result = enif_make_list_from_array(env, columns, column_count);
+    enif_free(columns);
+
+    return make_ok_tuple(env, result);
 }
 
 //
@@ -1289,6 +1344,7 @@ static ErlNifFunc nif_funcs[] = {
   {"errmsg", 1, exqlite_errmsg},
   {"errstr", 1, exqlite_errstr},
   {"compile_options", 0, exqlite_compile_options},
+  {"column_origins", 1, exqlite_column_origins},
 };
 
 ERL_NIF_INIT(Elixir.Exqlite.Sqlite3NIF, nif_funcs, on_load, NULL, NULL, on_unload)
