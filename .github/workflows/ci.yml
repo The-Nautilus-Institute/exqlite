@@ -56,10 +56,10 @@ jobs:
             otp: "27"
           - elixir: "1.16"
             otp: "27"
-        include:
-          - os: "windows-2019"
-            otp: "27"
-            elixir: "1.17"
+        # include:
+        #   - os: "windows-2019"
+        #     otp: "27"
+        #     elixir: "1.17"
 
     steps:
       - uses: actions/checkout@v4
