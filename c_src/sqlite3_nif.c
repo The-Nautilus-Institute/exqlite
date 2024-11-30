@@ -1372,6 +1372,27 @@ exqlite_column_types(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return make_ok_tuple(env, result);
 }
 
+ERL_NIF_TERM
+exqlite_normalize_sql(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    statement_t* statement;
+    ERL_NIF_TERM result;
+
+    if (argc != 1) {
+        return enif_make_badarg(env);
+    }
+
+    if (!enif_get_resource(env, argv[0], statement_type, (void**)&statement)) {
+        return raise_badarg(env, argv[0]);
+    }
+    
+    const char* sql = sqlite3_sql(statement->statement);
+
+    result = make_binary(env, sql, strlen(sql));
+
+    return make_ok_tuple(env, result);
+}
+
 //
 // Most of our nif functions are going to be IO bounded
 //
@@ -1405,6 +1426,7 @@ static ErlNifFunc nif_funcs[] = {
   {"errstr", 1, exqlite_errstr},
   {"compile_options", 0, exqlite_compile_options},
   {"column_origins", 1, exqlite_column_origins},
-  {"column_types", 1, exqlite_column_types}};
+  {"column_types", 1, exqlite_column_types},
+  {"normalize_sql", 1, exqlite_normalize_sql}};
 
 ERL_NIF_INIT(Elixir.Exqlite.Sqlite3NIF, nif_funcs, on_load, NULL, NULL, on_unload)

@@ -50,4 +50,15 @@ defmodule Exqlite.MetadataTest do
              ]
     end
   end
+
+  describe ".normalize_sql/1" do
+    test "returns the normalized SQL" do
+      goofy_sql = "sElEcT\n\t\t*\n\tFroM\n\t\tsqlite_schema"
+      {:ok, conn} = Sqlite3.open(":memory:")
+      {:ok, stmt} = Sqlite3.prepare(conn, goofy_sql)
+      {:ok, normalized} = Sqlite3.normalize_sql(stmt)
+
+      assert normalized == goofy_sql
+    end
+  end
 end

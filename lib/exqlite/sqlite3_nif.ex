@@ -106,5 +106,8 @@ defmodule Exqlite.Sqlite3NIF do
   @spec column_types(statement) :: {:ok, list(atom())} | {:error, reason()}
   def column_types(_stmt), do: :erlang.nif_error(:not_loaded)
 
+  @spec normalize_sql(statement) :: {:ok, String.t()} | {:error, reason()}
+  def normalize_sql(_stmt), do: :erlang.nif_error(:not_loaded)
+
   # add statement inspection tooling https://sqlite.org/c3ref/expanded_sql.html
 end
