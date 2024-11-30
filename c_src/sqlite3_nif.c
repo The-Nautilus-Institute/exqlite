@@ -1240,6 +1240,23 @@ exqlite_errstr(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     return make_binary(env, msg, strlen(msg));
 }
 
+static ERL_NIF_TERM
+exqlite_compile_options(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    ERL_NIF_TERM options = enif_make_list_from_array(env, NULL, 0);
+    const char* option;
+    size_t option_count = 0;
+    do {
+        const char* option = sqlite3_compileoption_get(option_count);
+        if (!option) {
+            break;
+        }
+        option_count++;
+        options = enif_make_list_cell(env, make_binary(env, option, strlen(option)), options);
+    } while (1);
+    return options;
+}
+
 //
 // Most of our nif functions are going to be IO bounded
 //
@@ -1271,6 +1288,7 @@ static ErlNifFunc nif_funcs[] = {
   {"interrupt", 1, exqlite_interrupt, ERL_NIF_DIRTY_JOB_IO_BOUND},
   {"errmsg", 1, exqlite_errmsg},
   {"errstr", 1, exqlite_errstr},
+  {"compile_options", 0, exqlite_compile_options},
 };
 
 ERL_NIF_INIT(Elixir.Exqlite.Sqlite3NIF, nif_funcs, on_load, NULL, NULL, on_unload)

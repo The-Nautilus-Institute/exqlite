@@ -96,5 +96,8 @@ defmodule Exqlite.Sqlite3NIF do
   @spec errstr(integer) :: String.t()
   def errstr(_rc), do: :erlang.nif_error(:not_loaded)
 
+  @spec compile_options() :: list(String.t())
+  def compile_options(), do: :erlang.nif_error(:not_loaded)
+
   # add statement inspection tooling https://sqlite.org/c3ref/expanded_sql.html
 end

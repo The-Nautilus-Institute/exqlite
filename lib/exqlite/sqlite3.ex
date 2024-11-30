@@ -467,6 +467,8 @@ defmodule Exqlite.Sqlite3 do
   defp errmsg(stmt), do: Sqlite3NIF.errmsg(stmt)
   defp errstr(rc), do: Sqlite3NIF.errstr(rc)
 
+  def compile_options(), do: Sqlite3NIF.compile_options()
+
   defp convert(%Date{} = val), do: Date.to_iso8601(val)
   defp convert(%Time{} = val), do: Time.to_iso8601(val)
   defp convert(%NaiveDateTime{} = val), do: NaiveDateTime.to_iso8601(val)
