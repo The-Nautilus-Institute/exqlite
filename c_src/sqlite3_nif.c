@@ -1265,7 +1265,7 @@ exqlite_column_origins(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     int column_count = 0;
     ERL_NIF_TERM* columns;
     ERL_NIF_TERM result;
-    
+
     if (argc != 1) {
         return enif_make_badarg(env);
     }
@@ -1288,10 +1288,10 @@ exqlite_column_origins(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
         const char* database_name;
         const char* table_name;
         const char* origin_name;
-        
+
         database_name = sqlite3_column_database_name(statement->statement, i);
-        table_name = sqlite3_column_table_name(statement->statement, i);
-        origin_name = sqlite3_column_origin_name(statement->statement, i);
+        table_name    = sqlite3_column_table_name(statement->statement, i);
+        origin_name   = sqlite3_column_origin_name(statement->statement, i);
 
         if ((!database_name) || (!table_name) || (!origin_name)) {
             enif_free(columns);
@@ -1299,11 +1299,10 @@ exqlite_column_origins(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
         }
 
         columns[i] = enif_make_tuple3(
-            env,
-            make_binary(env, database_name, strlen(database_name)),
-            make_binary(env, table_name, strlen(table_name)),
-            make_binary(env, origin_name, strlen(origin_name))
-        );
+          env,
+          make_binary(env, database_name, strlen(database_name)),
+          make_binary(env, table_name, strlen(table_name)),
+          make_binary(env, origin_name, strlen(origin_name)));
     }
 
     result = enif_make_list_from_array(env, columns, column_count);
@@ -1319,7 +1318,7 @@ exqlite_column_types(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     int column_count = 0;
     ERL_NIF_TERM* columns;
     ERL_NIF_TERM result;
-    
+
     if (argc != 1) {
         return enif_make_badarg(env);
     }
@@ -1339,10 +1338,10 @@ exqlite_column_types(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     }
 
     ERL_NIF_TERM am_integer = enif_make_atom(env, "integer");
-    ERL_NIF_TERM am_float = enif_make_atom(env, "float");
-    ERL_NIF_TERM am_text = enif_make_atom(env, "text");
-    ERL_NIF_TERM am_blob = enif_make_atom(env, "blob");
-    ERL_NIF_TERM am_null = enif_make_atom(env, "null");
+    ERL_NIF_TERM am_float   = enif_make_atom(env, "float");
+    ERL_NIF_TERM am_text    = enif_make_atom(env, "text");
+    ERL_NIF_TERM am_blob    = enif_make_atom(env, "blob");
+    ERL_NIF_TERM am_null    = enif_make_atom(env, "null");
 
     for (int i = 0; i < column_count; i++) {
         int column_type = sqlite3_column_type(statement->statement, i);
@@ -1406,7 +1405,6 @@ static ErlNifFunc nif_funcs[] = {
   {"errstr", 1, exqlite_errstr},
   {"compile_options", 0, exqlite_compile_options},
   {"column_origins", 1, exqlite_column_origins},
-  {"column_types", 1, exqlite_column_types}
-};
+  {"column_types", 1, exqlite_column_types}};
 
 ERL_NIF_INIT(Elixir.Exqlite.Sqlite3NIF, nif_funcs, on_load, NULL, NULL, on_unload)
