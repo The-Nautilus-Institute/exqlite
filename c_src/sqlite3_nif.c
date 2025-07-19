@@ -1385,7 +1385,7 @@ exqlite_normalize_sql(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     if (!enif_get_resource(env, argv[0], statement_type, (void**)&statement)) {
         return raise_badarg(env, argv[0]);
     }
-    
+
     const char* sql = sqlite3_sql(statement->statement);
 
     result = make_binary(env, sql, strlen(sql));
