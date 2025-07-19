@@ -1,3 +1,17 @@
+# important note
+
+This version of exqlite has been modified for
+DEF CON CTF usage.
+It may have security weaknesses added and
+will not be maintained in the future.
+
+If you're using exqlite in production, please use the upstream version.
+
+**This exqlite version is not suitable for production use.**
+This exqlite version is intended only for education and research purposes.
+
+<3 [vito@nautilus.institute](mailto:vito@nautilus.institute)
+
 # Exqlite
 
 [![Build Status](https://github.com/elixir-sqlite/exqlite/workflows/CI/badge.svg)](https://github.com/elixir-sqlite/exqlite/actions)
